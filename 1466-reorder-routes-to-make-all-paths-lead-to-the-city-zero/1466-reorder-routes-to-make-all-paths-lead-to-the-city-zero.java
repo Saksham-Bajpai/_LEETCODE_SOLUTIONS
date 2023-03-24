@@ -1,32 +1,28 @@
 class Solution {
-    private int res = 0;
-    private Set<Pair<Integer, Integer>> roads = new HashSet<>();
-    private Map<Integer, List<Integer>> graph = new HashMap<>();
-
     public int minReorder(int n, int[][] connections) {
-        for (int[] connection : connections) {
-            int u = connection[0];
-            int v = connection[1];
-            roads.add(new Pair<>(u, v));
-            graph.computeIfAbsent(v, k -> new ArrayList<>()).add(u);
-            graph.computeIfAbsent(u, k -> new ArrayList<>()).add(v);
+        List<List<Integer>> element = new ArrayList<>();
+        
+        for(int i=0;i<n;i++){
+            element.add(new ArrayList<Integer>());
         }
-
-        dfs(0, -1);
-
-        return res;
-    }
-
-    private void dfs(int u, int parent) {
-        if (parent != -1 && roads.contains(new Pair<>(parent, u))) {
-            res++;
+        for(int [] c:connections){
+            element.get(c[0]).add(c[1]);
+            element.get(c[1]).add(-c[0]);        
         }
+    return doDFS(element,new boolean[n],0);
+}
 
-        for (int v : graph.get(u)) {
-            if (v == parent) {
-                continue;
-            }
-            dfs(v, u);
+int doDFS(List<List<Integer>> element,boolean [] visited,int root){
+    
+    int count = 0;
+    visited[root] = true;
+    
+    for(int to: element.get(root)){
+        
+        if(!visited[Math.abs(to)]) {
+            count += doDFS(element,visited,Math.abs(to)) + ((to>0)?1:0);
         }
     }
+    return count;
+}
 }
